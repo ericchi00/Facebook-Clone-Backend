@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import httpErrors from 'http-errors';
 import cookieParser from 'cookie-parser';
+import bodyParser from 'body-parser';
 import cors from 'cors';
 import logger from 'morgan';
 import mongoose from 'mongoose';
@@ -14,6 +15,8 @@ import usersRouter from './routes/users.js';
 
 const app = express();
 
+app.use(bodyParser.json({ limit: '16mb', extended: true }));
+app.use(bodyParser.urlencoded({ limit: '16mb', extended: true }));
 const mongoDB = process.env.MONGODB_URI;
 mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true });
 const db = mongoose.connection;
