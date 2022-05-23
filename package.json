@@ -15,6 +15,7 @@
 	},
 	"dependencies": {
 		"bcryptjs": "^2.4.3",
+		"body-parser": "^1.20.0",
 		"compression": "^1.7.4",
 		"connect-flash": "^0.1.1",
 		"cookie-parser": "^1.4.6",
@@ -29,9 +30,11 @@
 		"helmet": "^5.0.2",
 		"http-errors": "^2.0.0",
 		"jsonwebtoken": "^8.5.1",
+		"mongo-image-converter": "^1.0.2",
 		"mongoose": "^6.3.3",
 		"morgan": "^1.10.0",
 		"passport": "^0.5.3",
+		"passport-facebook": "^3.0.0",
 		"passport-jwt": "^4.0.0",
 		"passport-local": "^1.0.0",
 		"sanitize-html": "^2.7.0"
