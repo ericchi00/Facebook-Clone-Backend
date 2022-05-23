@@ -1,19 +1,13 @@
 {
-  "extends": "airbnb",
-  "env": {
-    "node":true,
-    "mocha":true,
-    "es6": true
-  },
-  "rules": {
-    // disable requiring trailing commas
-    "comma-dangle": 0,
-    "max-len": ["error", {"code": 120, "ignoreComments": true, "ignoreUrls": true, "ignoreStrings": true}],
-    "no-unused-vars": ["error", { "argsIgnorePattern": "next" }]
-  },
-  "settings": {
-    "react": {
-      "version": "latest"
-    }
-  }
+	"extends": ["airbnb", "prettier"],
+	"env": {
+		"node": true,
+		"mocha": true,
+		"es6": true
+	},
+	"settings": {
+		"react": {
+			"version": "latest"
+		}
+	}
 }
