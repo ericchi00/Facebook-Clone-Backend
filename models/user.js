@@ -9,6 +9,8 @@ const userSchema = new Schema(
 		email: { type: String, required: true, minlength: 3 },
 		password: { type: String, required: true },
 		friends: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+		friendRequest: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+		picture: { type: Schema.Types.ObjectId, ref: 'Img' },
 	},
 	{ timestamps: true }
 );
