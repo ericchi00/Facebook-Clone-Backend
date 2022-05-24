@@ -38,24 +38,16 @@ app.use(cookieParser());
 app.use(helmet());
 app.use(compression());
 
-app.use(
-	session({
-		secret: process.env.SESSION_SECRET,
-		resave: false,
-		saveUninitialized: true,
-	})
-);
-
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.urlencoded({ extended: false }));
 
-app.all('/', (req, res, next) => {
-	res.redirect(301, '/api/blogposts');
-});
+// app.all('/', (req, res, next) => {
+// 	res.redirect(301, '/');
+// });
 
 app.use('/api', apiRouter);
-app.use('/users/', usersRouter);
+app.use('/users', usersRouter);
 
 app.use((req, res, next) => {
 	next(httpErrors(404));
