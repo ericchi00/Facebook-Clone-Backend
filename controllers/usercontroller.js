@@ -15,7 +15,7 @@ const registerPost = [
 		.custom((value) =>
 			User.exists({ email: value }).then((user) => {
 				if (user) {
-					return Promise.reject(new Error('Username already taken.'));
+					return Promise.reject(new Error('Email already taken.'));
 				}
 				return true;
 			})
@@ -37,7 +37,7 @@ const registerPost = [
 		.trim()
 		.isLength({ min: 1 })
 		.escape()
-		.withMessage('First name must be at least 1 characters'),
+		.withMessage('Last name must be at least 1 characters'),
 
 	body('password')
 		.isLength({ min: 5 })
@@ -47,18 +47,24 @@ const registerPost = [
 		try {
 			const errors = validationResult(req);
 			if (!errors.isEmpty()) {
-				res.json(errors);
-				return;
+				return res.json(errors);
 			}
-			bcrypt.hash(req.body.password, 10, (error, hashedPassword) => {
+			const firstName =
+				req.body.firstName.charAt(0).toUpperCase() +
+				req.body.firstName.slice(1).toLowerCase();
+			const lastName =
+				req.body.lastName.charAt(0).toUpperCase() +
+				req.body.lastName.slice(1).toLowerCase();
+			bcrypt.hash(req.body.password, 10, async (error, hashedPassword) => {
 				if (error) return next(error);
 				const user = new User({
-					firstName: req.body.firstName,
-					lastName: req.body.lastName,
+					firstName,
+					lastName,
 					email: req.body.email,
 					password: hashedPassword,
 				});
-				return user.save();
+				await user.save();
+				res.json('success');
 			});
 		} catch (error) {
 			next(error);
