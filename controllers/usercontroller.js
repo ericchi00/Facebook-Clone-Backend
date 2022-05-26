@@ -1,8 +1,7 @@
 import 'dotenv/config';
 import { body, validationResult } from 'express-validator';
-import bcrypt from 'bcryptjs';
-import passport from 'passport';
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
 import User from '../models/user.js';
 
 const registerPost = [
@@ -49,56 +48,52 @@ const registerPost = [
 			if (!errors.isEmpty()) {
 				return res.json(errors);
 			}
-			const firstName =
-				req.body.firstName.charAt(0).toUpperCase() +
-				req.body.firstName.slice(1).toLowerCase();
-			const lastName =
-				req.body.lastName.charAt(0).toUpperCase() +
-				req.body.lastName.slice(1).toLowerCase();
-			bcrypt.hash(req.body.password, 10, async (error, hashedPassword) => {
-				if (error) return next(error);
-				const user = new User({
-					firstName,
-					lastName,
-					email: req.body.email,
-					password: hashedPassword,
-				});
-				await user.save();
-				res.json('success');
+			const { email, password, firstName, lastName } = req.body;
+			const user = await User.create({
+				firstName,
+				lastName,
+				email,
+				password,
 			});
+			const token = jwt.sign({ user }, process.env.JWT_TOKEN);
+			const returnUser = { ...user.toJSON(), ...{ token } };
+
+			delete returnUser.password;
+
+			return res.status(201).json(returnUser);
 		} catch (error) {
-			next(error);
+			return next(error);
 		}
 	},
 ];
 
 const loginPost = async (req, res, next) => {
-	passport.authenticate('local', async (err, user, info) => {
-		try {
-			if (err || !user) {
-				return next(err);
-			}
+	try {
+		const { email, password } = req.body;
+		const user = await User.findOne({ email });
 
-			req.login(user, { session: false }, (error) => {
-				if (error) {
-					return next(error);
-				}
-				const token = jwt.sign({ user }, process.env.JWT_TOKEN, {
-					expiresIn: '15m',
+		if (user && user.email) {
+			if (await bcrypt.compare(password, user.password)) {
+				const token = jwt.sign({ email }, process.env.JWT_TOKEN, {
+					expiresIn: '2h',
 				});
-				return res.json({
+				const returnUser = {
 					authState: {
-						email: user.email,
 						id: user._id,
+						firstName: user.firstName,
+						lastName: user.lastName,
+						email: user.email,
 					},
-					expiresIn: 15,
+					expiresIn: 120,
 					token,
-				});
-			});
-		} catch (error) {
-			return next(error);
+				};
+				return res.status(200).json(returnUser);
+			}
 		}
-	})(req, res, next);
+		throw new Error('Incorrect username or password or does not exist');
+	} catch (error) {
+		return next(error);
+	}
 };
 
 const logoutPost = (req, res, next) => {
