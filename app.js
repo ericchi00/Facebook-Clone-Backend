@@ -6,10 +6,10 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import logger from 'morgan';
 import mongoose from 'mongoose';
-import session from 'express-session';
 import helmet from 'helmet';
 import compression from 'compression';
 import passport from 'passport';
+import applyPassportStrategy from './auth/passport.js';
 import apiRouter from './routes/api.js';
 import usersRouter from './routes/users.js';
 
@@ -23,29 +23,27 @@ const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
 app.use(logger('dev'));
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
 app.use(
-	session({
-		secret: process.env.SESSION_SECRET,
-		resave: false,
-		saveUninitialized: true,
+	cors({
+		credentials: true,
+		origin: true,
 	})
 );
+app.options('*', cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-app.use(helmet());
-app.use(compression());
+applyPassportStrategy(passport);
 
-app.use(passport.initialize());
-app.use(passport.session());
 app.use(express.urlencoded({ extended: false }));
 
 // app.all('/', (req, res, next) => {
 // 	res.redirect(301, '/');
 // });
 
+app.use(helmet());
+app.use(compression());
 app.use('/api', apiRouter);
 app.use('/users', usersRouter);
 
