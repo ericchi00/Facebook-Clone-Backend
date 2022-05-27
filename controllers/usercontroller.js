@@ -100,13 +100,69 @@ const loginPost = async (req, res, next) => {
 	}
 };
 
-const logoutPost = (req, res, next) => {
-	try {
-		req.logout();
-	} catch (error) {
-		next(error);
-	}
-};
+const putUserInfo = [
+	body('email')
+		.trim()
+		.isLength({ min: 5 })
+		.withMessage('Email must be at least 5 characters')
+		.isEmail()
+		.normalizeEmail()
+		.custom((value) =>
+			User.exists({ email: value }).then((user) => {
+				if (user) {
+					return Promise.reject(new Error('Email already taken.'));
+				}
+				return true;
+			})
+		),
+	body('firstName')
+		.trim()
+		.isLength({ min: 1 })
+		.escape()
+		.withMessage('First name must be at least 1 characters')
+		.custom((value) =>
+			User.exists({ email: value }).then((user) => {
+				if (user) {
+					return Promise.reject(new Error('Username already taken.'));
+				}
+				return true;
+			})
+		),
+	body('lastName')
+		.trim()
+		.isLength({ min: 1 })
+		.escape()
+		.withMessage('Last name must be at least 1 characters'),
+
+	body('password')
+		.isLength({ min: 5 })
+		.withMessage('Password must be at least 5 characters'),
+	body('confirmPassword').custom((value, { req }) => {
+		if (value !== req.body.password) {
+			throw new Error('Passwords must match.');
+		} else return true;
+	}),
+	async (req, res, next) => {
+		try {
+			const errors = validationResult(req);
+			if (!errors.isEmpty()) {
+				return res.json(errors);
+			}
+			bcrypt.hash(req.body.password, 10, async (error, hashedPassword) => {
+				if (error) return next(error);
+				await User.findByIdAndUpdate(req.params.id, {
+					firstName: req.body.firstName,
+					lastName: req.body.lastName,
+					email: req.body.lastName,
+					password: hashedPassword,
+				});
+			});
+			return res.status(204);
+		} catch (error) {
+			next(error);
+		}
+	},
+];
 
 const getProfileInfo = async (req, res, next) => {
 	try {
@@ -121,4 +177,4 @@ const getProfileInfo = async (req, res, next) => {
 	}
 };
 
-export { registerPost, loginPost, logoutPost, getProfileInfo };
+export { registerPost, loginPost, putUserInfo, getProfileInfo };
