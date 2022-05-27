@@ -1,9 +1,21 @@
 {
-	"extends": ["airbnb", "prettier"],
+	"extends": ["airbnb", "prettier", "import"],
 	"env": {
 		"node": true,
 		"mocha": true,
 		"es6": true
+	},
+	"rules": {
+		"import/extensions": [
+			"error",
+			"ignorePackages",
+			{
+				"js": "never",
+				"jsx": "never",
+				"ts": "never",
+				"tsx": "never"
+			}
+		]
 	},
 	"settings": {
 		"react": {
