@@ -1,6 +1,5 @@
-import passport from 'passport';
-import { Strategy as LocalStrategy } from 'passport-local';
 import { ExtractJwt, Strategy as JWTStrategy } from 'passport-jwt';
+// eslint-disable-next-line import/extensions
 import User from '../models/user.js';
 
 const applyPassportStrategy = (passport) => {
@@ -16,6 +15,7 @@ const applyPassportStrategy = (passport) => {
 					if (user) {
 						return done(null, {
 							email: user.email,
+							// eslint-disable-next-line no-underscore-dangle
 							id: user._id,
 							firstName: user.firstName,
 							lastName: user.lastName,
