@@ -74,9 +74,13 @@ const loginPost = async (req, res, next) => {
 
 		if (user && user.email) {
 			if (await bcrypt.compare(password, user.password)) {
-				const token = jwt.sign({ email }, process.env.JWT_TOKEN, {
-					expiresIn: '2h',
-				});
+				const token = jwt.sign(
+					{ id: user._id, email: user.email },
+					process.env.JWT_TOKEN,
+					{
+						expiresIn: '1h',
+					}
+				);
 				const returnUser = {
 					authState: {
 						id: user._id,
@@ -84,7 +88,7 @@ const loginPost = async (req, res, next) => {
 						lastName: user.lastName,
 						email: user.email,
 					},
-					expiresIn: 120,
+					expiresIn: 60,
 					token,
 				};
 				return res.status(200).json(returnUser);
@@ -104,4 +108,17 @@ const logoutPost = (req, res, next) => {
 	}
 };
 
-export { registerPost, loginPost, logoutPost };
+const getProfileInfo = async (req, res, next) => {
+	try {
+		const user = await User.findById(req.params.id);
+		const returnUser = { ...user.toJSON() };
+
+		delete returnUser.password;
+
+		return res.status(200).json(returnUser);
+	} catch (error) {
+		next(error);
+	}
+};
+
+export { registerPost, loginPost, logoutPost, getProfileInfo };
