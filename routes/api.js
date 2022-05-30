@@ -1,8 +1,19 @@
 import { Router } from 'express';
 import passport from 'passport';
-import { getProfileInfo } from '../controllers/usercontroller.js';
+import { postUserPost } from '../controllers/postcontroller.js';
+import {
+	putUserInfo,
+	getProfileInfo,
+	putUserPicture,
+} from '../controllers/usercontroller.js';
 
 const router = Router();
+
+router.post(
+	'/posts/:id',
+	passport.authenticate('jwt', { session: false }),
+	postUserPost
+);
 
 router.get(
 	'/profile/:id',
@@ -10,10 +21,16 @@ router.get(
 	getProfileInfo
 );
 
-router.post(
-	'/posts/:id',
+router.put(
+	'/profile/:id',
 	passport.authenticate('jwt', { session: false }),
-	postUserPost
+	putUserInfo
+);
+
+router.put(
+	'/profile/picture/:id',
+	passport.authenticate('jwt', { session: false }),
+	putUserPicture
 );
 
 export default router;
