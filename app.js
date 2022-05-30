@@ -11,7 +11,7 @@ import compression from 'compression';
 import passport from 'passport';
 import applyPassportStrategy from './auth/passport.js';
 import apiRouter from './routes/api.js';
-import usersRouter from './routes/users.js';
+import authRouter from './routes/auth.js';
 
 const app = express();
 
@@ -38,14 +38,10 @@ applyPassportStrategy(passport);
 
 app.use(express.urlencoded({ extended: false }));
 
-// app.all('/', (req, res, next) => {
-// 	res.redirect(301, '/');
-// });
-
 app.use(helmet());
 app.use(compression());
 app.use('/api', apiRouter);
-app.use('/users', usersRouter);
+app.use('/auth', authRouter);
 
 app.use((req, res, next) => {
 	next(httpErrors(404));
