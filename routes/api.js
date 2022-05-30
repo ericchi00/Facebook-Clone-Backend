@@ -10,4 +10,10 @@ router.get(
 	getProfileInfo
 );
 
+router.post(
+	'/posts/:id',
+	passport.authenticate('jwt', { session: false }),
+	postUserPost
+);
+
 export default router;
