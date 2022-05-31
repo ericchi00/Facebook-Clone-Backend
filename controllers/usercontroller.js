@@ -197,4 +197,82 @@ const getProfileInfo = async (req, res, next) => {
 	}
 };
 
-export { registerPost, loginPost, putUserInfo, getProfileInfo, putUserPicture };
+const getFriends = async (req, res, next) => {
+	try {
+		const user = await User.findById(req.params.id).populate(
+			'friends',
+			'firstName lastName'
+		);
+		return res.status(200).json(user);
+	} catch (error) {
+		next(error);
+	}
+};
+
+const getFriendRequest = async (req, res, next) => {
+	try {
+		const friendRequestArray = await User.findById(req.params.id).populate({
+			path: 'friendRequest',
+			select: 'firstName lastName _id',
+		});
+
+		return res.status(200).json(friendRequestArray);
+	} catch (error) {
+		next(error);
+	}
+};
+
+const putFriendRequest = async (req, res, next) => {
+	try {
+		const friend = await User.findById(req.body.friend);
+		friend.friendRequest.push(req.body.user);
+		friend.save();
+		return res.status(200).json({ status: 'success' });
+	} catch (error) {
+		next(error);
+	}
+};
+
+const deleteFriendRequest = async (req, res, next) => {
+	try {
+		const friend = await User.findById(req.body.friend);
+		friend.friendRequest.pull(req.body.user);
+		friend.save();
+		return res.status(200).json({ status: 'success' });
+	} catch (error) {
+		next(error);
+	}
+};
+
+const acceptFriendRequest = async (req, res, next) => {
+	try {
+		const [user, friend] = await Promise.all([
+			User.findById(req.params.id),
+			User.findById(req.body.friend),
+		]);
+
+		user.friendRequest.pull(req.body.friend);
+		user.friends.push(req.body.friend);
+		user.save();
+
+		friend.friends.push(req.params.id);
+		friend.save();
+
+		return res.status(200).json({ status: 'success' });
+	} catch (error) {
+		next(error);
+	}
+};
+
+export {
+	registerPost,
+	loginPost,
+	putUserInfo,
+	getProfileInfo,
+	putUserPicture,
+	putFriendRequest,
+	deleteFriendRequest,
+	getFriends,
+	getFriendRequest,
+	acceptFriendRequest,
+};
