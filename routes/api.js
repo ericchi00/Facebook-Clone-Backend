@@ -5,6 +5,11 @@ import {
 	putUserInfo,
 	getProfileInfo,
 	putUserPicture,
+	putFriendRequest,
+	deleteFriendRequest,
+	getFriends,
+	getFriendRequest,
+	acceptFriendRequest,
 } from '../controllers/usercontroller.js';
 
 const router = Router();
@@ -31,6 +36,36 @@ router.put(
 	'/profile/picture/:id',
 	passport.authenticate('jwt', { session: false }),
 	putUserPicture
+);
+
+router.get(
+	'/friends/:id',
+	passport.authenticate('jwt', { session: false }),
+	getFriends
+);
+
+router.get(
+	'/friends/request/:id',
+	passport.authenticate('jwt', { session: false }),
+	getFriendRequest
+);
+
+router.put(
+	'/friends/request',
+	passport.authenticate('jwt', { session: false }),
+	putFriendRequest
+);
+
+router.put(
+	'/friends/request/:id',
+	passport.authenticate('jwt', { session: false }),
+	acceptFriendRequest
+);
+
+router.delete(
+	'/friends/request',
+	passport.authenticate('jwt', { session: false }),
+	deleteFriendRequest
 );
 
 export default router;
