@@ -10,6 +10,7 @@ import {
 	getFriends,
 	getFriendRequest,
 	acceptFriendRequest,
+	deleteFriend,
 } from '../controllers/usercontroller.js';
 
 const router = Router();
@@ -66,6 +67,12 @@ router.delete(
 	'/friends/request',
 	passport.authenticate('jwt', { session: false }),
 	deleteFriendRequest
+);
+
+router.delete(
+	'/friends/:id',
+	passport.authenticate('jwt', { session: false }),
+	deleteFriend
 );
 
 export default router;
