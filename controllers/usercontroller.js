@@ -213,7 +213,7 @@ const getFriendRequest = async (req, res, next) => {
 		const friendRequestArray = await User.findById(req.params.id)
 			.populate({
 				path: 'friendRequest',
-				select: 'firstName lastName _id',
+				select: 'firstName lastName _id picture',
 			})
 			.select('friendRequest');
 		return res.status(200).json(friendRequestArray);
