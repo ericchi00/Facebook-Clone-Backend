@@ -224,9 +224,27 @@ const getFriendRequest = async (req, res, next) => {
 
 const putFriendRequest = async (req, res, next) => {
 	try {
-		const friend = await User.findById(req.body.friend);
+		const [friend, user] = await Promise.all([
+			User.findById(req.body.friend),
+			User.findById(req.body.user),
+		]);
+
+		if (
+			friend.friendRequest.includes(req.body.user) ||
+			user.sentFriendRequest.includes(req.body.friend)
+		) {
+			return res
+				.status(409)
+				.status({
+					status: 'failure',
+					message: 'User already sent friend request',
+				});
+		}
 		friend.friendRequest.push(req.body.user);
 		friend.save();
+		user.sentFriendRequest.push(req.body.friend);
+		user.save();
+
 		return res.status(200).json({ status: 'success' });
 	} catch (error) {
 		next(error);
@@ -240,11 +258,19 @@ const acceptFriendRequest = async (req, res, next) => {
 			User.findById(req.body.friend),
 		]);
 
+		if (user.friends.includes(req.body.friend)) {
+			return res.status(409).json({
+				status: 'failure',
+				message: 'User is already friends with this person.',
+			});
+		}
+
 		user.friendRequest.pull(req.body.friend);
 		user.friends.push(req.body.friend);
 		user.save();
 
 		friend.friends.push(req.params.id);
+		friend.sentFriendRequest.pull(req.params.id);
 		friend.save();
 
 		return res.status(200).json({ status: 'success' });
@@ -256,6 +282,7 @@ const acceptFriendRequest = async (req, res, next) => {
 const deleteFriendRequest = async (req, res, next) => {
 	try {
 		const friend = await User.findById(req.body.friend);
+		friend.sentFriendRequest.pull(req.body.user);
 		friend.friendRequest.pull(req.body.user);
 		friend.save();
 		return res.status(200).json({ status: 'success' });
