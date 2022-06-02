@@ -224,22 +224,21 @@ const getFriendRequest = async (req, res, next) => {
 
 const putFriendRequest = async (req, res, next) => {
 	try {
-		const [friend, user] = await Promise.all([
-			User.findById(req.body.friend),
+		const [user, friend] = await Promise.all([
 			User.findById(req.body.user),
+			User.findById(req.body.friend),
 		]);
 
 		if (
 			friend.friendRequest.includes(req.body.user) ||
 			user.sentFriendRequest.includes(req.body.friend)
 		) {
-			return res
-				.status(409)
-				.status({
-					status: 'failure',
-					message: 'User already sent friend request',
-				});
+			return res.status(409).status({
+				status: 'failure',
+				message: 'User already sent friend request',
+			});
 		}
+
 		friend.friendRequest.push(req.body.user);
 		friend.save();
 		user.sentFriendRequest.push(req.body.friend);
@@ -251,10 +250,29 @@ const putFriendRequest = async (req, res, next) => {
 	}
 };
 
-const acceptFriendRequest = async (req, res, next) => {
+const deleteFriendRequest = async (req, res, next) => {
 	try {
 		const [user, friend] = await Promise.all([
-			User.findById(req.params.id),
+			User.findById(req.body.user),
+			User.findById(req.body.friend),
+		]);
+		user.sentFriendRequest.pull(req.body.friend);
+		user.friendRequest.pull(req.body.friend);
+		await user.save();
+		friend.friendRequest.pull(req.body.user);
+		friend.sentFriendRequest.pull(req.body.user);
+		await friend.save();
+
+		return res.status(200).json({ status: 'success' });
+	} catch (error) {
+		next(error);
+	}
+};
+
+const putFriend = async (req, res, next) => {
+	try {
+		const [user, friend] = await Promise.all([
+			User.findById(req.body.user),
 			User.findById(req.body.friend),
 		]);
 
@@ -265,26 +283,16 @@ const acceptFriendRequest = async (req, res, next) => {
 			});
 		}
 
+		user.sentFriendRequest.pull(req.body.friend);
 		user.friendRequest.pull(req.body.friend);
 		user.friends.push(req.body.friend);
-		user.save();
+		await user.save();
 
-		friend.friends.push(req.params.id);
-		friend.sentFriendRequest.pull(req.params.id);
-		friend.save();
-
-		return res.status(200).json({ status: 'success' });
-	} catch (error) {
-		next(error);
-	}
-};
-
-const deleteFriendRequest = async (req, res, next) => {
-	try {
-		const friend = await User.findById(req.body.friend);
-		friend.sentFriendRequest.pull(req.body.user);
 		friend.friendRequest.pull(req.body.user);
-		friend.save();
+		friend.sentFriendRequest.pull(req.body.user);
+		friend.friends.push(req.body.user);
+		await friend.save();
+
 		return res.status(200).json({ status: 'success' });
 	} catch (error) {
 		next(error);
@@ -299,9 +307,9 @@ const deleteFriend = async (req, res, next) => {
 		]);
 
 		user.friends.pull(req.body.friend);
-		user.save();
+		await user.save();
 		friend.friends.pull(req.params.id);
-		friend.save();
+		await friend.save();
 
 		return res.status(200).json({ status: 'success' });
 	} catch (error) {
@@ -319,6 +327,6 @@ export {
 	deleteFriendRequest,
 	getFriends,
 	getFriendRequest,
-	acceptFriendRequest,
+	putFriend,
 	deleteFriend,
 };
