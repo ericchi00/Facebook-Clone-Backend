@@ -6,11 +6,11 @@ import {
 	getProfileInfo,
 	putUserPicture,
 	putFriendRequest,
-	deleteFriendRequest,
 	getFriends,
 	getFriendRequest,
-	acceptFriendRequest,
+	putFriend,
 	deleteFriend,
+	deleteFriendRequest,
 } from '../controllers/usercontroller.js';
 
 const router = Router();
@@ -60,7 +60,7 @@ router.put(
 router.put(
 	'/friends/request/:id',
 	passport.authenticate('jwt', { session: false }),
-	acceptFriendRequest
+	putFriend
 );
 
 router.delete(
