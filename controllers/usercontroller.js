@@ -100,6 +100,18 @@ const loginPost = async (req, res, next) => {
 	}
 };
 
+const getAllUsers = async (req, res, next) => {
+	try {
+		const users = await User.find(
+			{ _id: { $ne: req.params.id } },
+			'_id firstName lastName picture sentFriendRequest friends friendRequest'
+		);
+		return res.status(200).json(users);
+	} catch (error) {
+		next(error);
+	}
+};
+
 const getProfileInfo = async (req, res, next) => {
 	try {
 		const user = await User.findById(req.params.id);
@@ -317,6 +329,15 @@ const deleteFriend = async (req, res, next) => {
 	}
 };
 
+const deleteUserAccount = async (req, res, next) => {
+	try {
+		const user = await User.findByIdAndDelete(req.params.id);
+		return res.status(200).json({ status: 'sucess' });
+	} catch (error) {
+		next(error);
+	}
+};
+
 export {
 	registerPost,
 	loginPost,
@@ -329,4 +350,6 @@ export {
 	getFriendRequest,
 	putFriend,
 	deleteFriend,
+	deleteUserAccount,
+	getAllUsers,
 };
