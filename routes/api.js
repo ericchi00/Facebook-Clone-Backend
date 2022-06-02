@@ -11,6 +11,8 @@ import {
 	putFriend,
 	deleteFriend,
 	deleteFriendRequest,
+	deleteUserAccount,
+	getAllUsers,
 } from '../controllers/usercontroller.js';
 
 const router = Router();
@@ -25,6 +27,12 @@ router.get(
 	'/profile/:id',
 	passport.authenticate('jwt', { session: false }),
 	getProfileInfo
+);
+
+router.get(
+	'/profiles/:id',
+	passport.authenticate('jwt', { session: false }),
+	getAllUsers
 );
 
 router.put(
@@ -73,6 +81,12 @@ router.delete(
 	'/friends/:id',
 	passport.authenticate('jwt', { session: false }),
 	deleteFriend
+);
+
+router.delete(
+	'/profile/:id',
+	passport.authenticate('jwt', { session: false }),
+	deleteUserAccount
 );
 
 export default router;
