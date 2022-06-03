@@ -24,11 +24,13 @@ const postUserPost = [
 				return res.status(400).json(errors);
 			}
 
-			const { userPost } = req.body;
+			const { userPost, picture } = req.body;
 			await Post.create({
 				name: req.params.id,
 				text: userPost,
+				picture: picture,
 			});
+			return res.status(200).json({ status: 'success' });
 		} catch (error) {
 			next(error);
 		}
