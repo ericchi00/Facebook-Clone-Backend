@@ -1,6 +1,10 @@
 import { Router } from 'express';
 import passport from 'passport';
-import { postUserPost } from '../controllers/postcontroller.js';
+import {
+	getAllPosts,
+	postUserPost,
+	putPostLike,
+} from '../controllers/postcontroller.js';
 import {
 	putUserInfo,
 	getProfileInfo,
@@ -14,13 +18,48 @@ import {
 	deleteUserAccount,
 	getAllUsers,
 } from '../controllers/usercontroller.js';
+import {
+	postComment,
+	getComment,
+	putCommentLike,
+} from '../controllers/commentcontroller.js';
 
 const router = Router();
+
+router.get(
+	'/posts',
+	passport.authenticate('jwt', { session: false }),
+	getAllPosts
+);
 
 router.post(
 	'/posts/:id',
 	passport.authenticate('jwt', { session: false }),
 	postUserPost
+);
+
+router.put(
+	'/posts/:id',
+	passport.authenticate('jwt', { session: false }),
+	putPostLike
+);
+
+router.post(
+	'/posts/:id/comments',
+	passport.authenticate('jwt', { session: false }),
+	postComment
+);
+
+router.get(
+	'/posts/:id/comments',
+	passport.authenticate('jwt', { session: false }),
+	getComment
+);
+
+router.put(
+	'/posts/comments/:id',
+	passport.authenticate('jwt', { session: false }),
+	putCommentLike
 );
 
 router.get(
