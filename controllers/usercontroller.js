@@ -105,7 +105,7 @@ const getAllUsers = async (req, res, next) => {
 		const users = await User.find(
 			{ _id: { $ne: req.params.id } },
 			'_id firstName lastName picture sentFriendRequest friends friendRequest'
-		);
+		).sort({ firstName: 1 });
 		return res.status(200).json(users);
 	} catch (error) {
 		next(error);
@@ -212,8 +212,13 @@ const putUserPicture = async (req, res, next) => {
 const getFriends = async (req, res, next) => {
 	try {
 		const user = await User.findById(req.params.id)
-			.populate('friends', 'firstName lastName _id picture')
+			.populate({
+				path: 'friends',
+				select: 'firstName lastName _id picture',
+				options: { sort: { firstName: 1 } },
+			})
 			.select('friends');
+
 		return res.status(200).json(user);
 	} catch (error) {
 		next(error);
