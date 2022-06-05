@@ -16,7 +16,6 @@ import {
 	putFriend,
 	deleteFriend,
 	deleteFriendRequest,
-	deleteUserAccount,
 	getAllUsers,
 } from '../controllers/usercontroller.js';
 import {
@@ -128,11 +127,4 @@ router.delete(
 	passport.authenticate('jwt', { session: false }),
 	deleteFriend
 );
-
-router.delete(
-	'/profile/:id',
-	passport.authenticate('jwt', { session: false }),
-	deleteUserAccount
-);
-
 export default router;

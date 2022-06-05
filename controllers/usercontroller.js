@@ -348,6 +348,5 @@ export {
 	getFriendRequest,
 	putFriend,
 	deleteFriend,
-	deleteUserAccount,
 	getAllUsers,
 };
