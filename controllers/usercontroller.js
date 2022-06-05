@@ -257,9 +257,9 @@ const putFriendRequest = async (req, res, next) => {
 		}
 
 		friend.friendRequest.push(req.body.user);
-		friend.save();
+		await friend.save();
 		user.sentFriendRequest.push(req.body.friend);
-		user.save();
+		await user.save();
 
 		return res.status(200).json({ status: 'success' });
 	} catch (error) {
