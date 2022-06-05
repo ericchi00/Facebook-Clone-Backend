@@ -336,32 +336,6 @@ const deleteFriend = async (req, res, next) => {
 	}
 };
 
-const deleteUserAccount = async (req, res, next) => {
-	try {
-		const user = await User.findById(req.params.id);
-
-		User.friends.forEach((id) => {
-			const friend = await User.findById(id);
-			friend.friends.pull(req.params.id);
-			friend.save();
-		})
-
-		User.friendRequest.forEach((id) => {
-			const friend = await User.findById(id);
-			friend.friendRequest.pull(req.params.id);
-			friend.save();
-		})
-
-		const posts = await Post.deleteMany({ name: req.params.id });
-		const comment = await Comment.deleteMany({ name: req.params.id });
-		await User.findByIdAndDelete(req.params.id);
-
-		return res.status(200).json({ status: 'sucess' });
-	} catch (error) {
-		next(error);
-	}
-};
-
 export {
 	registerPost,
 	loginPost,
