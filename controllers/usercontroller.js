@@ -341,15 +341,15 @@ const deleteUserAccount = async (req, res, next) => {
 		const user = await User.findById(req.params.id);
 
 		User.friends.forEach((id) => {
-			const user = await User.findById(id);
-			user.friends.pull(req.params.id);
-			user.save();
+			const friend = await User.findById(id);
+			friend.friends.pull(req.params.id);
+			friend.save();
 		})
 
 		User.friendRequest.forEach((id) => {
-			const user = await User.findById(id);
-			user.friendRequest.pull(req.params.id);
-			user.save();
+			const friend = await User.findById(id);
+			friend.friendRequest.pull(req.params.id);
+			friend.save();
 		})
 
 		const posts = await Post.deleteMany({ name: req.params.id });
