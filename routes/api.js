@@ -4,6 +4,7 @@ import {
 	getAllPosts,
 	postUserPost,
 	putPostLike,
+	getUserPosts,
 } from '../controllers/postcontroller.js';
 import {
 	putUserInfo,
@@ -30,6 +31,12 @@ router.get(
 	'/posts',
 	passport.authenticate('jwt', { session: false }),
 	getAllPosts
+);
+
+router.get(
+	'/profile/:id/posts',
+	passport.authenticate('jwt', { session: false }),
+	getUserPosts
 );
 
 router.post(

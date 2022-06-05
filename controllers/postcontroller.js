@@ -17,6 +17,23 @@ const getAllPosts = async (req, res, next) => {
 	}
 };
 
+const getUserPosts = async (req, res, next) => {
+	try {
+		const posts = await Post.find({ name: req.params.id })
+			.populate('name', 'firstName lastName picture likes')
+			.populate({
+				path: 'comments',
+				populate: { path: 'name', select: 'firstName lastName _id picture' },
+				options: { sort: { createdAt: -1 } },
+			})
+			.sort([['createdAt', 'descending']]);
+
+		return res.status(200).json(posts);
+	} catch (error) {
+		next(error);
+	}
+};
+
 const postUserPost = [
 	body('userPost')
 		.isLength({ min: 1 })
@@ -58,4 +75,4 @@ const putPostLike = async (req, res, next) => {
 	}
 };
 
-export { getAllPosts, postUserPost, putPostLike };
+export { getAllPosts, postUserPost, putPostLike, getUserPosts };
