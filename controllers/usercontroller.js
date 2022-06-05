@@ -3,6 +3,8 @@ import { body, validationResult } from 'express-validator';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import User from '../models/user.js';
+import Post from '../models/post.js';
+import Comment from '../models/comment.js';
 
 const registerPost = [
 	body('email')
@@ -336,7 +338,24 @@ const deleteFriend = async (req, res, next) => {
 
 const deleteUserAccount = async (req, res, next) => {
 	try {
-		const user = await User.findByIdAndDelete(req.params.id);
+		const user = await User.findById(req.params.id);
+
+		User.friends.forEach((id) => {
+			const user = await User.findById(id);
+			user.friends.pull(req.params.id);
+			user.save();
+		})
+
+		User.friendRequest.forEach((id) => {
+			const user = await User.findById(id);
+			user.friendRequest.pull(req.params.id);
+			user.save();
+		})
+
+		const posts = await Post.deleteMany({ name: req.params.id });
+		const comment = await Comment.deleteMany({ name: req.params.id });
+		await User.findByIdAndDelete(req.params.id);
+
 		return res.status(200).json({ status: 'sucess' });
 	} catch (error) {
 		next(error);
