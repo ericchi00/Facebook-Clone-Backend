@@ -104,8 +104,9 @@ const loginPost = async (req, res, next) => {
 
 const getAllUsers = async (req, res, next) => {
 	try {
+		const { user } = req.body;
 		const users = await User.find(
-			{ _id: { $ne: req.params.id } },
+			{ _id: { $ne: user } },
 			'_id firstName lastName picture sentFriendRequest friends friendRequest'
 		).sort({ firstName: 1 });
 		return res.status(200).json(users);

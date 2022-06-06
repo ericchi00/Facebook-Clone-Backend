@@ -75,7 +75,7 @@ router.get(
 );
 
 router.get(
-	'/profiles/:id',
+	'/profiles',
 	passport.authenticate('jwt', { session: false }),
 	getAllUsers
 );
